@@ -1,11 +1,16 @@
 use arg::{check_x, Cli, Mode};
 use clap::Parser;
+use send::de_send;
+use sendinfo::RequestData;
 
 mod arg;
+mod error;
 mod projectinfo;
+mod send;
 mod sendinfo;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let cli = Cli::parse();
 
     match cli.mode {
@@ -22,7 +27,8 @@ fn main() {
             }
         }
         Mode::X(args) => {
-            check_x(args);
+            let sendreq = check_x(args).unwrap();
+            de_send(sendreq).await;
         }
     }
 }

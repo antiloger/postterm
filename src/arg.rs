@@ -1,3 +1,7 @@
+use crate::{
+    error::{PtError, Result},
+    sendinfo::RequestData,
+};
 use clap::{Args, Parser, Subcommand};
 
 #[derive(Parser)]
@@ -53,10 +57,14 @@ pub struct InfoArgs {
     pub model: Option<String>,
 }
 
-pub fn check_x(x: Restargs) {
+pub fn check_x(x: Restargs) -> Result<RequestData> {
     if let Some(get_x) = x.get {
-        print!("get >> {}", get_x);
+        println!("{}", get_x);
+        Ok(RequestData::new(reqwest::Method::GET, get_x, None, None))
     } else if let Some(post_x) = x.post {
-        print!("post >> {}", post_x);
+        println!("{}", post_x);
+        Ok(RequestData::new(reqwest::Method::POST, post_x, None, None))
+    } else {
+        Err(PtError::ArgNotProvide)
     }
 }
