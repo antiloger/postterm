@@ -1,6 +1,6 @@
 use crate::{
     error::{PtError, Result},
-    sendinfo::RequestData,
+    sendinfo::{BodyData, HeaderData, RequestData},
 };
 use clap::{Args, Parser, Subcommand};
 
@@ -38,10 +38,10 @@ pub struct Restargs {
     pub delete: Option<String>,
     /// header for REST
     #[arg(short = 't')]
-    pub header: Vec<String>,
+    pub header: Option<String>,
     /// body for REST
     #[arg(short = 'b')]
-    pub body: Vec<String>,
+    pub body: Option<String>,
 }
 
 #[derive(Args)]
@@ -59,8 +59,19 @@ pub struct InfoArgs {
 
 pub fn check_x(x: Restargs) -> Result<RequestData> {
     if let Some(get_x) = x.get {
-        println!("{}", get_x);
-        Ok(RequestData::new(reqwest::Method::GET, get_x, None, None))
+        println!("gett {} b {:?} h {:?}", get_x, x.body, x.header);
+        let mut hd: Option<HeaderData> = None;
+        let mut bd: Option<BodyData> = None;
+
+        if let Some(head) = x.header {
+            hd = Some(HeaderData::get_header(head)?);
+        }
+
+        if let Some(body) = x.body {
+            bd = Some(BodyData::get_body(body)?);
+        }
+
+        Ok(RequestData::new(reqwest::Method::GET, get_x, bd, hd))
     } else if let Some(post_x) = x.post {
         println!("{}", post_x);
         Ok(RequestData::new(reqwest::Method::POST, post_x, None, None))

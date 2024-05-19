@@ -1,7 +1,7 @@
 use arg::{check_x, Cli, Mode};
 use clap::Parser;
 use send::de_send;
-use sendinfo::RequestData;
+use sendinfo::{BodyData, RequestData};
 
 mod arg;
 mod error;
@@ -28,6 +28,7 @@ async fn main() {
         }
         Mode::X(args) => {
             let sendreq = check_x(args).unwrap();
+            println!("{:#?}", sendreq);
             de_send(sendreq).await;
         }
     }
