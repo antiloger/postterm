@@ -1,13 +1,13 @@
-use std::str::FromStr;
-
 use crate::sendinfo::{BodyData, HeaderData, RequestData};
 use reqwest::header::{HeaderName, HeaderValue};
 use reqwest::{header, Client, Method, RequestBuilder};
+use serde_json::Value;
 pub async fn de_send(data: RequestData) {
     let client = reqwest::Client::new();
     let builder = build_request(&client, &data.url, data.method, data.header, data.body).await;
     let response = builder.send().await;
-    println!("response: {:#?}", response)
+    let head = response.unwrap().headers().clone();
+    println!("{:#?}", head);
 }
 
 pub async fn build_request(
@@ -18,13 +18,14 @@ pub async fn build_request(
     body: Option<BodyData>,
 ) -> RequestBuilder {
     let mut builder = client.request(method, url);
+
     if let Some(head) = header {
         let mut header_map = header::HeaderMap::new();
         header_map.insert(
             header::USER_AGENT,
             HeaderValue::from_str(&head.user_agent).expect("Invalid user_agent header"),
         );
-        // TODO: add for loop to custom headers
+
         for (key, value) in head.header_data {
             header_map.insert(
                 HeaderName::from_bytes(key.as_bytes()).unwrap(),
@@ -35,7 +36,7 @@ pub async fn build_request(
     }
 
     if let Some(data) = body {
-        // TODO: complete the convert part
+        // TODO: complete the convert part, add error handling
         match data {
             BodyData::Text(text) => {
                 println!("body is text: {}", text);
@@ -45,7 +46,9 @@ pub async fn build_request(
                 println!("body is binary: {}", bin);
             }
             BodyData::Json(json) => {
-                println!("body is json: {}", json);
+                let json_body: Value = serde_json::from_str(&json).unwrap();
+                builder = builder.json(&json_body);
+                println!("body is json: {}", json_body);
             }
             BodyData::FormData(_) => {
                 println!("body is fromdata: ");

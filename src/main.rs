@@ -6,6 +6,7 @@ use sendinfo::{BodyData, RequestData};
 mod arg;
 mod error;
 mod projectinfo;
+mod response;
 mod send;
 mod sendinfo;
 

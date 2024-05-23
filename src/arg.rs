@@ -58,24 +58,28 @@ pub struct InfoArgs {
 }
 
 pub fn check_x(x: Restargs) -> Result<RequestData> {
+    let methodvalue: reqwest::Method;
+    let url_str: String;
     if let Some(get_x) = x.get {
-        println!("gett {} b {:?} h {:?}", get_x, x.body, x.header);
-        let mut hd: Option<HeaderData> = None;
-        let mut bd: Option<BodyData> = None;
-
-        if let Some(head) = x.header {
-            hd = Some(HeaderData::get_header(head)?);
-        }
-
-        if let Some(body) = x.body {
-            bd = Some(BodyData::get_body(body)?);
-        }
-
-        Ok(RequestData::new(reqwest::Method::GET, get_x, bd, hd))
+        methodvalue = reqwest::Method::GET;
+        url_str = get_x;
     } else if let Some(post_x) = x.post {
-        println!("{}", post_x);
-        Ok(RequestData::new(reqwest::Method::POST, post_x, None, None))
+        methodvalue = reqwest::Method::POST;
+        url_str = post_x;
     } else {
-        Err(PtError::ArgNotProvide)
+        return Err(PtError::ArgNotProvide);
     }
+
+    let mut hd: Option<HeaderData> = None;
+    let mut bd: Option<BodyData> = None;
+
+    if let Some(head) = x.header {
+        hd = Some(HeaderData::get_header(head)?);
+    }
+
+    if let Some(body) = x.body {
+        bd = Some(BodyData::get_body(body)?);
+    }
+
+    Ok(RequestData::new(methodvalue, url_str, bd, hd))
 }
