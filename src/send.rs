@@ -1,8 +1,11 @@
+use crate::error::Result;
+use crate::response::Response;
 use crate::sendinfo::{BodyData, HeaderData, RequestData};
 use reqwest::header::{HeaderName, HeaderValue};
 use reqwest::{header, Client, Method, RequestBuilder};
 use serde_json::Value;
-pub async fn de_send(data: RequestData) {
+
+pub async fn de_send(data: RequestData) -> Result<Response> {
     let client = reqwest::Client::new();
     let builder = build_request(&client, &data.url, data.method, data.header, data.body).await;
     let response = builder.send().await;

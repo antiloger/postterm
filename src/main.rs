@@ -1,7 +1,6 @@
 use arg::{check_x, Cli, Mode};
 use clap::Parser;
 use send::de_send;
-use sendinfo::{BodyData, RequestData};
 
 mod arg;
 mod error;
